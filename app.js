@@ -307,13 +307,15 @@ class CampusNavigator {
       const marker = L.marker(data.coords)
         .addTo(this.map)
         .bindPopup(`
-          <div class="popup-content">
-            <h3>${name}</h3>
-            <p>${data.description}</p>
-            <button class="use-as-start" data-location="${name}">Jadikan Asal</button>
-            <button class="use-as-end" data-location="${name}">Jadikan Tujuan</button>
+          <div class="popup-content" style="font-family: 'Poppins', sans-serif; max-width: 250px;">
+            <h3 style="font-size: 1.1rem; font-weight: 600; color: #006641;">${name}</h3>
+            <p style="font-size: 0.9rem; color: #555;">${data.description}</p>
+            <div style="display: flex; gap: 8px; margin-top: 8px;">
+              <button class="use-as-start" data-location="${name}" style="flex: 1; padding: 6px 8px; background-color: #006641; color: white; border: none; border-radius: 4px;">Asal</button>
+              <button class="use-as-end" data-location="${name}" style="flex: 1; padding: 6px 8px; background-color: #0e7490; color: white; border: none; border-radius: 4px;">Tujuan</button>
+            </div>
           </div>
-        `);
+        `)
       
       marker.on('popupopen', () => {
         document.querySelector('.use-as-start').addEventListener('click', (e) => {
@@ -656,46 +658,48 @@ class CampusNavigator {
   const startName = this.dom.startInput.value.trim();
   const endName = this.dom.endInput.value.trim();
   
-    let directionsHTML = '';
-    
-    // Tambahkan instruksi awal
-   directionsHTML += `
-    <div class="route-step">
-      <div class="step-number">1</div>
-      <div class="step-content">
-        <p>Mulai dari <strong>${startName}</strong></p>
-        ${startData && startData.description ? `<small>${startData.description}</small>` : ''}
-      </div>
+let directionsHTML = '';
+
+// Langkah awal
+directionsHTML += `
+  <div class="route-step flex gap-3 items-start mb-4">
+    <div class="step-number bg-blue-600 text-white w-8 h-8 flex items-center justify-center rounded-full">1</div>
+    <div class="step-content text-left">
+      <p class="font-semibold">Mulai dari <strong>${startName}</strong></p>
+      ${startData?.description ? `<p class="text-sm text-gray-500 italic">${startData.description}</p>` : ''}
     </div>
-  `;
-    
-    // Tambahkan setiap langkah
-  route.segments.forEach(segment => {
-    segment.steps.forEach((step, i) => {
-      directionsHTML += `
-        <div class="route-step">
-          <div class="step-number">${i + 2}</div>
-          <div class="step-content">
-            <p>${step.instruction}</p>
-            ${step.distance > 0 ? `<p class="step-distance">${step.distance < 1000 ? step.distance.toFixed(0) + ' meter' : (step.distance / 1000).toFixed(1) + ' km'}</p>` : ''}
-          </div>
+  </div>
+`;
+
+// Langkah-langkah dari API
+let stepCount = 2;
+route.segments.forEach(segment => {
+  segment.steps.forEach(step => {
+    directionsHTML += `
+      <div class="route-step flex gap-3 items-start mb-4">
+        <div class="step-number bg-green-600 text-white w-8 h-8 flex items-center justify-center rounded-full">${stepCount++}</div>
+        <div class="step-content text-left">
+          <p class="font-medium text-gray-800">${step.instruction}</p>
+          ${step.distance > 0 ? `<p class="text-sm text-gray-500">${step.distance < 1000 ? `${step.distance.toFixed(0)} meter` : `${(step.distance / 1000).toFixed(1)} km`}</p>` : ''}
         </div>
-      `;
-    });
-  });
-    
-    // Tambahkan instruksi akhir
-  directionsHTML += `
-    <div class="route-step">
-      <div class="step-number">${route.segments.reduce((acc, seg) => acc + seg.steps.length, 1) + 1}</div>
-      <div class="step-content">
-        <p>Tiba di <strong>${endName}</strong></p>
-        ${endData && endData.description ? `<small>${endData.description}</small>` : ''}
       </div>
+    `;
+  });
+});
+
+// Langkah akhir
+directionsHTML += `
+  <div class="route-step flex gap-3 items-start mb-4">
+    <div class="step-number bg-blue-600 text-white w-8 h-8 flex items-center justify-center rounded-full">${stepCount}</div>
+    <div class="step-content text-left">
+      <p class="font-semibold">Tiba di <strong>${endName}</strong></p>
+      ${endData?.description ? `<p class="text-sm text-gray-500 italic">${endData.description}</p>` : ''}
     </div>
-  `;
-  
-  this.dom.directionsPanel.innerHTML = directionsHTML;
+  </div>
+`;
+
+this.dom.directionsPanel.innerHTML = directionsHTML;
+
 }
 
   locateUser() {
@@ -810,3 +814,16 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 
+const directionsBox = document.getElementById("directions-box");
+const routeButton = document.getElementById("route-button");
+const resetButton = document.getElementById("reset-button");
+
+routeButton.addEventListener("click", () => {
+  // Logika cari rute jalan ...
+  directionsBox.classList.remove("hidden"); // tampilkan box arah
+});
+
+resetButton.addEventListener("click", () => {
+  // Reset map dan input ...
+  directionsBox.classList.add("hidden"); // sembunyikan box arah
+});
