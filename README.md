@@ -1,6 +1,6 @@
-# Maps Android App
+# Maps For UIN JAKARTA AREA
 
-This is a simple Webb application that utilizes **Open Route Service** to display a map At  **UIN JAKARTA**. It is designed for learning or demonstration purposes.
+This is a simple Web application that utilizes **Open Route Service** to display a map At  **UIN JAKARTA**. It is designed for learning or demonstration purposes.
 
 ## 📱 Features
 
